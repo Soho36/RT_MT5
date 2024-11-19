@@ -27,7 +27,7 @@ def send_buy_sell_orders(
         ticker,
         stop_loss_offset,
         risk_reward,
-        reverse_trades
+        # reverse_trades
 ):
     # +------------------------------------------------------------------+
     # BUY ORDER

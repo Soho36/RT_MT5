@@ -17,8 +17,8 @@ stop_loss_offset = 1                # Is added to SL for Shorts and subtracted f
 # hardcoded_sr_levels = [('2024-11-02 16:19:00', 69245.00), ('2024-11-02 16:19:00', 69167.00)]  # Example support levels
 
 level_interactions_threshold = 3    # Times
-max_time_waiting_for_entry = 5      # Minutes
-reverse_trades = False
+max_time_waiting_for_entry = 30      # Minutes
+# reverse_trades = False
 level_lifetime_minutes = 240         # Minutes
 
 clear_csv_before_start = True
@@ -138,7 +138,7 @@ def run_main_functions(b_s_flag, s_s_flag, l_signal):
         ticker,
         stop_loss_offset,
         risk_reward,
-        reverse_trades
+        # reverse_trades
     )
 
     l_signal = s_signal
