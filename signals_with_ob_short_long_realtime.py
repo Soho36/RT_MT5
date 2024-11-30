@@ -111,12 +111,12 @@ def level_rejection_signals(
 
                                 # Step 1: Find the first green candle (where close > open)
 
-                                # green_candle_low = None
-                                # potential_ob_time = None
-
                                 trade_type = 'rejection'
                                 side = 'short'
 
+                                # Track processed candles to avoid reprocessing
+                                processed_green_candles = set()  # Store indexes of green candles already used
+                                print('01', processed_green_candles)
                                 # OB candle - look for every green candle below SR level
                                 for subsequent_index in range(index + 1, len(output_df_with_levels)):
                                     potential_ob_candle = output_df_with_levels.iloc[subsequent_index]
@@ -134,7 +134,6 @@ def level_rejection_signals(
                                             max_time_waiting_for_entry,
                                             subsequent_index,
                                             potential_ob_time,
-
                                             level_interaction_signal_time,
                                             time_diff,
                                             trace
@@ -148,10 +147,16 @@ def level_rejection_signals(
                                     # Check for green candle and that it’s below SR level
                                     if potential_ob_candle['Close'] > potential_ob_candle['Open']:
                                         if potential_ob_candle['Close'] < current_sr_level:
+                                            if subsequent_index in processed_green_candles:
+                                                print('02', processed_green_candles)
+                                                print(
+                                                    f"Skipping already processed green candle at index {subsequent_index}."
+                                                )
+                                                continue  # Skip this candle since it's already been processed
 
                                             green_candle_low = potential_ob_candle['Low']
                                             print(f'Current green candle low: {green_candle_low}')
-                                            # green_candle_found = True
+
                                             if get_position_state() == '' or get_position_state() == 'closed':
                                                 print(
                                                     f"○ Green candle is below the SR level at index {subsequent_index}, "
@@ -159,7 +164,6 @@ def level_rejection_signals(
                                                 )
                                                 print('PLACE STOPMARKET.1A')
                                                 signal = f'-100+{subsequent_index}'
-                                                # trigger_price = potential_ob_candle['Low']
 
                                                 s_signal, n_index, t_price = signal_triggered_output(
                                                     subsequent_index,
@@ -169,17 +173,22 @@ def level_rejection_signals(
                                                     side,
                                                     signal
                                                 )
-                                                # continue
+                                                # Mark this green candle as processed
+                                                processed_green_candles.add(subsequent_index)
+                                                print('03', processed_green_candles)
+
                                             else:
                                                 print('There is an open position. No signals...'.upper())
-                                                break
+                                                # Mark this green candle as processed even if a position is open
+                                                processed_green_candles.add(subsequent_index)
+                                                print('04', processed_green_candles)
 
                                         else:
                                             print(
                                                 f"Green candle found, but it's not below the level. "
                                                 f"Checking next candle...")
 
-                    #                   BR-D LOGIC BEGIN HERE ******************************************************************************
+                    # BR-D LOGIC BEGIN HERE ******************************************************************************
 
                     # Previous close was above level
                     if previous_close is not None and previous_close > current_sr_level:
@@ -198,6 +207,10 @@ def level_rejection_signals(
                             # potential_ob_time = None
                             trade_type = 'BR-D'
                             side = 'short'
+
+                            # Track processed candles to avoid reprocessing
+                            processed_green_candles = set()  # Store indexes of green candles already used
+                            print('11', processed_green_candles)
 
                             for subsequent_index in range(index + 1, len(output_df_with_levels)):
 
@@ -237,6 +250,13 @@ def level_rejection_signals(
 
                                     # Check if the green candle is below the SR level
                                     if potential_ob_candle['Close'] < current_sr_level:
+                                        if subsequent_index in processed_green_candles:
+                                            print('12', processed_green_candles)
+                                            print(
+                                                f"Skipping already processed green candle at index {subsequent_index}."
+                                            )
+                                            continue  # Skip this candle since it's already been processed
+
                                         green_candle_low = potential_ob_candle['Low']
                                         # green_candle_found = True
                                         print(f'Current green candle low: {green_candle_low}')
@@ -257,10 +277,15 @@ def level_rejection_signals(
                                                 side,
                                                 signal
                                             )
-                                            # continue  # Exit the loop, as we have found the valid green candle below the level
+                                            # Mark this green candle as processed
+                                            processed_green_candles.add(subsequent_index)
+                                            print('13', processed_green_candles)
+
                                         else:
                                             print('There is an open position. No signals...'.upper())
-                                            break
+                                            # Mark this green candle as processed even if a position is open
+                                            processed_green_candles.add(subsequent_index)
+                                            print('14', processed_green_candles)
 
                                     else:
                                         print(
@@ -283,11 +308,12 @@ def level_rejection_signals(
                                       f"SR level: {current_sr_level}")
 
                                 # Step 1: Find the first red candle (where close < open)
-                                # red_candle_found = False
-                                # red_candle_high = None
-                                # potential_ob_time = None
                                 trade_type = 'rejection'
                                 side = 'long'
+
+                                # Track processed candles to avoid reprocessing
+                                processed_green_candles = set()  # Store indexes of green candles already used
+                                print('21', processed_green_candles)
 
                                 for subsequent_index in range(index + 1, len(output_df_with_levels)):
 
@@ -324,6 +350,13 @@ def level_rejection_signals(
                                         )
                                         # Check if the red candle is below the SR level
                                         if potential_ob_candle['Close'] > current_sr_level:
+                                            if subsequent_index in processed_green_candles:
+                                                print('22', processed_green_candles)
+                                                print(
+                                                    f"Skipping already processed green candle at index {subsequent_index}."
+                                                )
+                                                continue  # Skip this candle since it's already been processed
+
                                             red_candle_high = potential_ob_candle['High']
                                             print(f'Current red candle high: {red_candle_high}')
                                             # red_candle_found = True
@@ -344,10 +377,14 @@ def level_rejection_signals(
                                                     side,
                                                     signal
                                                 )
-                                                # continue
+                                                # Mark this green candle as processed
+                                                processed_green_candles.add(subsequent_index)
+                                                print('23', processed_green_candles)
                                             else:
                                                 print('There is an open position. No signals...'.upper())
-                                                break
+                                                # Mark this green candle as processed even if a position is open
+                                                processed_green_candles.add(subsequent_index)
+                                                print('24', processed_green_candles)
 
                                         else:
                                             print(f"Red candle found, but it's not above the level. "
@@ -366,11 +403,12 @@ def level_rejection_signals(
                                   f"SR level: {current_sr_level}")
 
                             # Step 1: Find the first red candle (where close < open)
-                            # red_candle_found = False
-                            # red_candle_high = None
-                            # potential_ob_time = None
                             trade_type = 'BR-O'
                             side = 'Long'
+
+                            # Track processed candles to avoid reprocessing
+                            processed_green_candles = set()  # Store indexes of green candles already used
+                            print('31', processed_green_candles)
 
                             for subsequent_index in range(index + 1, len(output_df_with_levels)):
 
@@ -409,7 +447,13 @@ def level_rejection_signals(
                                     )
                                     # Check if the red candle is above the SR level
                                     if potential_ob_candle['Close'] > current_sr_level:
-                                        # Candle must be above the level
+                                        if subsequent_index in processed_green_candles:
+                                            print('32', processed_green_candles)
+                                            print(
+                                                f"Skipping already processed green candle at index {subsequent_index}."
+                                            )
+                                            continue  # Skip this candle since it's already been processed
+
                                         red_candle_high = potential_ob_candle['High']
                                         print(f'Current red candle high: {red_candle_high}')
                                         # red_candle_found = True
@@ -430,10 +474,14 @@ def level_rejection_signals(
                                                 side,
                                                 signal
                                             )
-                                            # break
+                                            # Mark this green candle as processed
+                                            processed_green_candles.add(subsequent_index)
+                                            print('33', processed_green_candles)
                                         else:
                                             print('There is an open position. No signals...'.upper())
-                                            break
+                                            # Mark this green candle as processed even if a position is open
+                                            processed_green_candles.add(subsequent_index)
+                                            print('34', processed_green_candles)
                                     else:
                                         print(
                                             f"Red candle found, but it's not above the level. "
