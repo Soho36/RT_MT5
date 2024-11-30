@@ -11,11 +11,11 @@ void UpdatePositionState()
    // Check if the state has changed
    if (currentPositionState != lastPositionState)
    {
-      int fileHandle = FileOpen(positionStateFilePath, FILE_WRITE | FILE_TXT);
+      int fileHandle = FileOpen(positionStateFilePath, FILE_WRITE | FILE_TXT | FILE_ANSI);
 
       if (fileHandle != INVALID_HANDLE)
       {
-         FileWrite(fileHandle, currentPositionState);
+         FileWriteString(fileHandle, currentPositionState);
          Print("Position state updated: ", currentPositionState);
          FileClose(fileHandle);
 

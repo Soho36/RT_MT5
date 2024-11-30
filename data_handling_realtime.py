@@ -33,6 +33,9 @@ levels_path = (
     f'C:\\Users\\Liikurserv\\PycharmProjects\\RT_MT5\\hardcoded_sr_levels.csv'
 )
 
+position_state_path = (
+    'C:\\Users\\Liikurserv\\AppData\\Roaming\\MetaQuotes\\Terminal\\1D0E83E0BCAA42603583233CF21A762C\\MQL5\\Files\\PositionState.txt'
+)
 # SILLAMAE PATHS
 # mt5_logging_file_path = (
 #     f'C:\\Users\\Vova deduskin lap\\AppData\\Roaming\\MetaQuotes\\Terminal\\'
@@ -143,6 +146,13 @@ def remove_expired_levels(level_lifetime_minutes, dataframe_from_log):
     # Write the remaining levels back to the file
     with open(levels_path, 'w', encoding='utf-8') as file:
         file.writelines(updated_levels)
+
+
+def get_position_state():
+    with open(position_state_path, 'r', encoding='mbcs') as file:
+        state = file.read()
+        print(state)
+        return state
 
 
 def save_order_parameters_to_file(line_order_parameters):   # Called from orders_sender.py
