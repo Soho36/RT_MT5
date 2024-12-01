@@ -28,11 +28,11 @@ buy_sell_signals_for_mt5_filepath_2 = (
      f'buy_sell_signals_from_python_2.txt'
      )
 
-# Levels PATH for NinjaTrader:
 levels_path = (
     f'C:\\Users\\Liikurserv\\PycharmProjects\\RT_MT5\\hardcoded_sr_levels.csv'
 )
 
+list_of_orders_path = 'C:\\Users\\Liikurserv\\PycharmProjects\\RT_MT5\\list_of_orders.csv'
 position_state_path = (
     'C:\\Users\\Liikurserv\\AppData\\Roaming\\MetaQuotes\\Terminal\\1D0E83E0BCAA42603583233CF21A762C\\MQL5\\Files\\PositionState.txt'
 )
@@ -155,6 +155,7 @@ def get_position_state():
         return state
 
 
+# Create file for orders exchange between Python and MT5
 def save_order_parameters_to_file(line_order_parameters):   # Called from orders_sender.py
     with open(buy_sell_signals_for_mt5_filepath_1, 'w', encoding='utf-8') as file:
         file.writelines(line_order_parameters)
@@ -165,5 +166,19 @@ def save_order_parameters_to_file(line_order_parameters):   # Called from orders
         print('NEW ORDER IS SUCCESSFULLY SAVED TO FILE_2')
 
 
+# Create orders list file to track orders
+def save_list_of_orders_to_file(line_order_parameters_to_order_list):
+    with open(list_of_orders_path, 'w', encoding='utf-8') as file:
+        file.writelines(line_order_parameters_to_order_list)
+
+
+def get_last_order_time_from_file():
+    with open(list_of_orders_path, 'r', encoding='utf-8') as file:
+        try:
+            last_order_timestamp = pd.to_datetime(file.read())
+        except ValueError:
+            print('Wrong last order format')
+
+        return last_order_timestamp
 
 

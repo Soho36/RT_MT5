@@ -16,6 +16,7 @@ def level_rejection_signals(
     n_index = None
     s_signal = None
     t_price = None
+    s_time = None
     candle_counter = 0
     levels_to_remove = []  # List to queue levels for deletion
 
@@ -71,7 +72,7 @@ def level_rejection_signals(
             "++++++++++++++++++++++++++"
         )
         print('-----------------------------------------------------------------------------------------------------')
-        return ss_signal, nn_index, tt_price     # RETURNS SIGNAL FOR send_buy_sell_orders()
+        return ss_signal, nn_index, tt_price, sig_time     # RETURNS SIGNAL FOR send_buy_sell_orders()
 
     sr_level_columns = output_df_with_levels.columns[8:]  # Assuming SR level columns start from the 8th column onwards
     processed_green_candles_shorts = set()  # Track all processed green candles across logic
@@ -149,7 +150,6 @@ def level_rejection_signals(
 
                                     # Check for green candle and that it’s below SR level
                                     if potential_ob_candle['Close'] > potential_ob_candle['Open']:
-                                        processed_green_candles_shorts.add(subsequent_index)
                                         if potential_ob_candle['Close'] < current_sr_level:
                                             if subsequent_index in processed_green_candles_shorts:
                                                 print('Over-under set', processed_green_candles_shorts)
@@ -169,7 +169,7 @@ def level_rejection_signals(
                                                 print('PLACE STOPMARKET.1A')
                                                 signal = f'-100+{subsequent_index}'
 
-                                                s_signal, n_index, t_price = signal_triggered_output(
+                                                s_signal, n_index, t_price, s_time = signal_triggered_output(
                                                     subsequent_index,
                                                     potential_ob_time,
                                                     green_candle_low,
@@ -247,7 +247,6 @@ def level_rejection_signals(
 
                                 # Check if it's a green candle (close > open)
                                 if potential_ob_candle['Close'] > potential_ob_candle['Open']:
-                                    processed_green_candles_shorts.add(subsequent_index)
                                     print(
                                         f"○ Last GREEN candle found at index {subsequent_index}, "
                                         f"Time: {potential_ob_time}"
@@ -274,7 +273,7 @@ def level_rejection_signals(
                                             signal = f'-100+{subsequent_index}'
                                             # trigger_price = potential_ob_candle['Low']
 
-                                            s_signal, n_index, t_price = signal_triggered_output(
+                                            s_signal, n_index, t_price, s_time = signal_triggered_output(
                                                 subsequent_index,
                                                 potential_ob_time,
                                                 green_candle_low,
@@ -348,7 +347,6 @@ def level_rejection_signals(
                                     )
                                     # Check if it's a red candle (close < open)
                                     if potential_ob_candle['Close'] < potential_ob_candle['Open']:
-                                        processed_red_candles_longs.add(subsequent_index)
                                         print(
                                             f"○ Last RED candle found at index {subsequent_index}, "
                                             f"Time: {potential_ob_time}"
@@ -374,7 +372,7 @@ def level_rejection_signals(
                                                 signal = f'100+{subsequent_index}'
                                                 # trigger_price = potential_ob_candle['High']
 
-                                                s_signal, n_index, t_price = signal_triggered_output(
+                                                s_signal, n_index, t_price, s_time = signal_triggered_output(
                                                     subsequent_index,
                                                     potential_ob_time,
                                                     red_candle_high,
@@ -445,7 +443,6 @@ def level_rejection_signals(
 
                                 # Check if it's a red candle (close < open)
                                 if potential_ob_candle['Close'] < potential_ob_candle['Open']:
-                                    processed_red_candles_longs.add(subsequent_index)
                                     print(
                                         f"○ Last RED candle found at index {subsequent_index}, "
                                         f"Time: {potential_ob_time}"
@@ -471,7 +468,7 @@ def level_rejection_signals(
                                             signal = f'100+{subsequent_index}'
                                             # trigger_price = potential_ob_candle['High']
 
-                                            s_signal, n_index, t_price = signal_triggered_output(
+                                            s_signal, n_index, t_price, s_time = signal_triggered_output(
                                                 subsequent_index,
                                                 potential_ob_time,
                                                 red_candle_high,
@@ -503,5 +500,6 @@ def level_rejection_signals(
             n_index,
             t_price,
             levels_to_remove,
-            candle_counter
+            candle_counter,
+            s_time
     )
