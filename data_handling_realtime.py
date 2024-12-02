@@ -174,10 +174,9 @@ def save_list_of_orders_to_file(line_order_parameters_to_order_list):
 
 def get_last_order_time_from_file():
     with open(list_of_orders_path, 'r', encoding='utf-8') as file:
-        try:
-            last_order_timestamp = pd.to_datetime(file.read())
-        except ValueError:
-            print('Wrong last order format')
+        last_order_timestamp = pd.to_datetime(file.read())
+        if pd.isna(last_order_timestamp):
+            last_order_timestamp = pd.to_datetime('2024-01-01 00:00:00')  # Default value while the file is empty
 
         return last_order_timestamp
 
