@@ -33,27 +33,27 @@ def send_buy_sell_orders(
         last_order_timestamp
 ):
 
-    # time_difference_current_last_order = None
     current_time = pd.to_datetime(datetime.now())
     current_order_timestamp = pd.to_datetime(current_order_timestamp)
-    time_difference_current_last_order = None
+    time_difference_current_time_order = None
 
     if not pd.isna(current_order_timestamp):
-        time_difference_current_last_order = ((current_time - current_order_timestamp).total_seconds() / 60)
+        time_difference_current_time_order = ((current_time - current_order_timestamp).total_seconds() / 60)
 
-    # +------------------------------------------------------------------+
-    # BUY ORDER
-    # +------------------------------------------------------------------+
     print(f'Last signal: {last_signal}'.upper())
     print(f'Current signal: {current_signal}'.upper())
     print(f'Last order timestamp: {last_order_timestamp}')
     print(f'Current order timestamp: {current_order_timestamp}')
     print(f'Current time: {current_time}')
 
+    # +------------------------------------------------------------------+
+    # BUY ORDER
+    # +------------------------------------------------------------------+
     if not pd.isna(current_order_timestamp):
-        if time_difference_current_last_order < 1:
+
+        if current_signal != last_signal:
             # If time difference between current and last order is positive then it's accepted:
-            if current_signal != last_signal:
+            if time_difference_current_time_order < 1:
                 # If there is unique new signal and flag is True:
                 if current_signal == f'100+{n_index}' and buy_signal:  # If there is signal and flag is True:
 
@@ -62,9 +62,14 @@ def send_buy_sell_orders(
                     print('▲ ▲ ▲ Buy order has been sent to MT5! ▲ ▲ ▲'.upper())
 
                     # ORDER PARAMETERS
+                    entry_price = last_candle_high
+
+                    # Stop Loss Price
                     stop_loss_price = round(last_candle_low - stop_loss_offset, 3)
-                    take_profit_price = round((((last_candle_high - stop_loss_price) * risk_reward)  # R/R hardcoded
-                                               + last_candle_high) + stop_loss_offset, 3)
+                    risk = entry_price - stop_loss_price  # Distance between entry and stop loss
+
+                    # Take Profit Prices (based on R:R ratios)
+                    take_profit_price = round(entry_price + 1 * risk, 3)  # 1:1 R:R
 
                     line_order_parameters = f'{ticker},Buy,{t_price},{stop_loss_price},{take_profit_price}'  # NO WHITESPACES
                     print('line_order_parameters: ', line_order_parameters)
@@ -80,9 +85,9 @@ def send_buy_sell_orders(
 
                 if current_signal != last_signal:
                     buy_signal, sell_signal = True, True  # Reset flags to allow the next unique signal
-        else:
-            winsound.PlaySound('Windows Critical Stop.wav', winsound.SND_FILENAME)
-            print('Longs: Old signal. Rejected')
+            else:
+                winsound.PlaySound('Windows Critical Stop.wav', winsound.SND_FILENAME)
+                print('Longs: Old signal. Rejected')
     else:
         print('Longs: No new orders so far')
 
@@ -91,9 +96,9 @@ def send_buy_sell_orders(
     # +------------------------------------------------------------------+
 
     if not pd.isna(current_order_timestamp):
-        if time_difference_current_last_order < 1:
+        if current_signal != last_signal:
             # If time difference between current and last order is positive then it's accepted:
-            if current_signal != last_signal:
+            if time_difference_current_time_order < 1:
                 # Proceed if no last order exists or if the current order timestamp is newer
                 if current_signal == f'-100+{n_index}' and sell_signal:
                     # Play sound to indicate order sent
@@ -101,10 +106,15 @@ def send_buy_sell_orders(
                     print()
                     print('▼ ▼ ▼ Sell order has been sent to MT5! ▼ ▼ ▼'.upper())
 
-                    # Order parameters
+                    # ORDER PARAMETERS
+                    entry_price = last_candle_low
+
+                    # Stop Loss Price
                     stop_loss_price = round(last_candle_high + stop_loss_offset, 3)
-                    take_profit_price = round((last_candle_low - ((stop_loss_price - last_candle_low) * risk_reward))
-                                              + stop_loss_offset, 3)
+                    risk = stop_loss_price - entry_price
+
+                    # Take Profit Prices (based on R:R ratios)
+                    take_profit_price = round(entry_price - 1 * risk, 3)
 
                     line_order_parameters = f'{ticker},Sell,{t_price},{stop_loss_price},{take_profit_price}'
                     print('line_order_parameters: ', line_order_parameters)
@@ -120,9 +130,9 @@ def send_buy_sell_orders(
 
                 if current_signal != last_signal:
                     buy_signal, sell_signal = True, True  # Reset flags to allow the next unique signal
-        else:
-            winsound.PlaySound('Windows Critical Stop.wav', winsound.SND_FILENAME)
-            print('Shorts: Old signal. Rejected')
+            else:
+                winsound.PlaySound('Windows Critical Stop.wav', winsound.SND_FILENAME)
+                print('Shorts: Old signal. Rejected')
     else:
         print('Shorts: No new orders so far')
 
