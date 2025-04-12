@@ -26,14 +26,13 @@ clear_csv_before_start = True
 # **************************************************************************************************************
 
 # LIIKURI PATHS
-path_ohlc = \
-    'C:\\Users\\Liikurserv\\AppData\\Roaming\\MetaQuotes\\Terminal\\1D0E83E0BCAA42603583233CF21A762C\\MQL5\\Files'
-file = 'OHLCVData_475.csv'
+# path_ohlc = \
+#     'C:\\Users\\Liikurserv\\AppData\\Roaming\\MetaQuotes\\Terminal\\1D0E83E0BCAA42603583233CF21A762C\\MQL5\\Files'
 
 # SILLAMAE PATHS
-# path = 'C:\\Users\\Vova deduskin lap\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Files'
-# file = 'OHLCVData_475.csv'
-# SILLAMAE PATHS
+path_ohlc = 'C:\\Users\\Vova deduskin lap\\AppData\\Roaming\\MetaQuotes\\Terminal\\D0E8209F77C8CF37AD8BF550E51FF075\\MQL5\\Files'
+file = 'OHLCVData_475.csv'
+
 
 buy_signal_flag = True                    # MUST BE TRUE BEFORE ENTERING MAIN LOOP
 sell_signal_flag = True                   # MUST BE TRUE BEFORE ENTERING MAIN LOOP
